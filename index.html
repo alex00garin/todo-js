@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo List</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.15/dist/tailwind.min.css" rel="stylesheet"> 
+</head>
+<body class="bg-black text-white">
+ 
+  <div id="datetime" class="flex justify-end text-sm m-5 font-bold"></div>
+
+  <div class="m-5 w-full">
+    <h2 class="font-bold mb-5 text-xl">My To Do List</h2>
+    <input type="text" id="myInput" placeholder="Title..." class="text-black font-light py-2 rounded-md pl-3 w-56">
+    <button onclick="newElement()" class="addBtn font-light ml-3 border rounded-md px-4 py-2">Add</button>
+  </div>
+
+  <ul id="task-list" class="h-fit w-auto border rounded-md m-5 font-light p-3">
+    
+  </ul>
+
+<script src="script.js"></script>
+</body>
+</html>
