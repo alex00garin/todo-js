@@ -1,59 +1,92 @@
+const taskInput = document.getElementById('taskInput');
+const taskList = document.getElementById('taskList');
 
-// Create a "close" button and append it to each list item
-let myNodelist = document.getElementsByTagName("LI");
-var i;
-for (i = 0; i < myNodelist.length; i++) {
-  let span = document.createElement("SPAN");
-  let txt = document.createTextNode("\u00D7");
-  span.className = "close";
-  span.appendChild(txt);
-  myNodelist[i].appendChild(span);
+// Load tasks from localStorage on page load
+window.addEventListener('load', loadTasks);
+
+// Function to add a new task
+function addTask() {
+    const taskText = taskInput.value.trim();
+    if (taskText === '') return;
+
+    // Get the selected priority from the dropdown
+    const prioritySelect = document.getElementById('prioritySelect');
+    const selectedPriority = prioritySelect.value;
+
+    const task = {
+        text: taskText,
+        completed: false,
+        timestamp: new Date().toLocaleString(),
+        priority: selectedPriority, // Add priority
+    };
+
+    const tasks = getTasksFromLocalStorage();
+    tasks.push(task);
+    saveTasksToLocalStorage(tasks);
+    taskInput.value = '';
+    displayTasks();
 }
 
-// Click on a close button to hide the current list item
-let close = document.getElementsByClassName("close");
-var i;
-for (i = 0; i < close.length; i++) {
-  close[i].onclick = function() {
-    let div = this.parentElement;
-    div.style.display = "none";
-  }
+
+
+// Function to display tasks on the page
+function displayTasks() {
+    taskList.innerHTML = '';
+    const tasks = getTasksFromLocalStorage();
+    tasks.forEach((task, index) => {
+        const taskItem = document.createElement('li');
+        taskItem.innerHTML = `
+            <input class="" type="checkbox" onchange="toggleTask(${index})" ${task.completed ? 'checked' : ''}>
+            <span class="ml-3">${task.text} - ${task.priority}, ${task.timestamp}</span>
+            <button class="edit font-light" onclick="editTask(${index})">Edit</button>
+            <button class="close font-light" onclick="deleteTask(${index})">Delete</button>
+        `;
+        taskList.appendChild(taskItem);
+    });
 }
 
-// Add a "checked" symbol when clicking on a list item
-let list = document.querySelector('ul');
-list.addEventListener('click', function(ev) {
-  if (ev.target.tagName === 'LI') {
-    ev.target.classList.toggle('checked');
-  }
-}, false);
 
-// Create a new list item when clicking on the "Add" button
-const addBtn = document.getElementById('addBtn');
-function newElement() {
-  let li = document.createElement("li");
-  let inputValue = document.getElementById("myInput").value;
-  let t = document.createTextNode(inputValue);
-  li.appendChild(t);
-  if (inputValue === '') {
-    alert("You must write something!");
-  } else {
-    document.getElementById("task-list").appendChild(li);
-  }
-  document.getElementById("myInput").value = "";
+// Function to toggle task completion status
+function toggleTask(index) {
+    const tasks = getTasksFromLocalStorage();
+    tasks[index].completed = !tasks[index].completed;
+    saveTasksToLocalStorage(tasks);
+    displayTasks();
+}
 
-  let span = document.createElement("SPAN");
-  let txt = document.createTextNode("\u00D7");
-  span.className = "close";
-  span.appendChild(txt);
-  li.appendChild(span);
-
-  for (i = 0; i < close.length; i++) {
-    close[i].onclick = function() {
-      let div = this.parentElement;
-      div.style.display = "none";
+// Function to edit a task
+function editTask(index) {
+    const tasks = getTasksFromLocalStorage();
+    const updatedText = prompt('Edit task:', tasks[index].text);
+    if (updatedText !== null) {
+        tasks[index].text = updatedText;
+        saveTasksToLocalStorage(tasks);
+        displayTasks();
     }
-  }
+}
+
+// Function to delete a task
+function deleteTask(index) {
+    const tasks = getTasksFromLocalStorage();
+    tasks.splice(index, 1);
+    saveTasksToLocalStorage(tasks);
+    displayTasks();
+}
+
+// Function to load tasks from localStorage
+function loadTasks() {
+    displayTasks();
+}
+
+// Function to get tasks from localStorage
+function getTasksFromLocalStorage() {
+    const tasksJSON = localStorage.getItem('tasks');
+    return tasksJSON ? JSON.parse(tasksJSON) : [];
+}
+
+// Function to save tasks to localStorage
+function saveTasksToLocalStorage(tasks) {
+    localStorage.setItem('tasks', JSON.stringify(tasks));
 }
 
 const datetimeElement = document.getElementById('datetime');
@@ -69,7 +102,7 @@ function updateDateTime() {
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
-    second: '2-digit',  // 2-digit second (e.g., "25")
+    second: '2-digit',
   };
 
   const dateTimeString = now.toLocaleString('en-UK', options); // Customize locale and options as needed
